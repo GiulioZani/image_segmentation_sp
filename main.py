@@ -1,5 +1,4 @@
 from matplotlib import pyplot as plt
-from data_loader import get_generators
 from model import get_model
 import tensorflow as tf
 from tensorflow.keras.layers import (
@@ -19,10 +18,11 @@ from tensorflow.keras.layers import (
 from tensorflow.keras.regularizers import l2
 from tensorflow.keras.models import Model
 from tensorflow.keras.utils import plot_model
-from tensorflow.keras.optimizers import Adam
 from keras import layers
 from keras import models
 from tensorflow.python.keras.layers import ConvLSTM2D
+
+from data_loader import DataLoader
 
 
 def main():
@@ -30,7 +30,11 @@ def main():
         cuda_only=False, min_cuda_compute_capability=None
     )
     print(f"\n gpu_available={gpu_available}\n")
-    train_generator, val_generator = get_generators()
+    train_loader, val_loader = DataLoader("train", squeeze=False).get_loaders()
+
+    x, y = next(train_loader)
+    print("x.shape:", x.shape)
+    print("y.shape:", y.shape)
     """
     x, y = train_generator.__next__()
     print(x.shape)
@@ -84,7 +88,7 @@ def main():
 
     dil_rate = (2, 2)
 
-    model = get_model()
+    model = get_model(x.shape)
 
     from keras import backend as K
 
