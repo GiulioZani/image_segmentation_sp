@@ -29,66 +29,20 @@ def main():
     gpu_available = tf.test.is_gpu_available(
         cuda_only=False, min_cuda_compute_capability=None
     )
-    print(f"\n gpu_available={gpu_available}\n")
-    train_loader, val_loader = DataLoader("train", squeeze=False).get_loaders()
+    model_type = "2D"
+    train_loader, val_loader = DataLoader(
+        "train", squeeze=model_type == "2D"
+    ).get_loaders()
 
     x, y = next(train_loader)
+
+    print(f"\n gpu_available={gpu_available}")
+    print(f"model_type={model_type}")
     print("x.shape:", x.shape)
     print("y.shape:", y.shape)
-    """
-    x, y = train_generator.__next__()
-    print(x.shape)
-    print(y.shape)
-    for i in range(0, 3):
-        image = x[i, -1, :, :, 0]
-        # mask = np.argmax(y[i], axis=2)
-        mask = y[i, -1, :, :, 0]
-        plt.subplot(1, 2, 1)
-        plt.imshow(image, cmap="gray")
-        plt.axis("off")
-        plt.subplot(1, 2, 2)
-        plt.imshow(mask, cmap="gray")
-        plt.axis("off")
-        plt.show()
-
-    x.shape
-
-    y.shape
-
-    val_generator = Gen(val_generator)
-    x, y = val_generator.__next__()
-
-    for i in range(0, 3):
-        image = x[i, 0, :, :, 0]
-        # mask = np.argmax(y[i], axis=2)
-        mask = y[i, 0, :, :, 0]
-        plt.subplot(1, 2, 1)
-        plt.imshow(image, cmap="gray")
-        plt.axis("off")
-        plt.subplot(1, 2, 2)
-        plt.imshow(mask, cmap="gray")
-        plt.axis("off")
-        plt.show()
-
-    # Define the model metrcis and load model.
-    """
-    # num_train_imgs = len(os.listdir("/gdrive/MyDrive/train/train_images/images"))
-    # num_val_images = len(os.listdir("/gdrive/MyDrive/train/val_images/images"))
-    # steps_per_epoch = num_train_imgs // batch_size
-    # val_steps_per_epoch = num_val_images // batch_size
-    """
-    batch=x.shape[0]
-    steps=x.shape[1]
-    IMG_HEIGHT = x.shape[2]
-    IMG_WIDTH  = x.shape[3]
-    IMG_CHANNELS = x.shape[4]
-    input_shape = (3, IMG_HEIGHT, IMG_WIDTH, IMG_CHANNELS)
-    print(input_shape)
-    """
-
     dil_rate = (2, 2)
 
-    model = get_model(x.shape)
+    model = get_model(x.shape, model_type)
 
     from keras import backend as K
 
@@ -97,10 +51,7 @@ def main():
         y_true_f = K.flatten(y_true)
         y_pred_f = K.flatten(y_pred)
         # print(y_true_f.shape, y_pred_f.shape)
-        try:
-            intersection = K.sum(y_true_f * y_pred_f)
-        except:
-            ipdb.set_trace()
+        intersection = K.sum(y_true_f * y_pred_f)
         return (2.0 * intersection + smooth) / (
             K.sum(y_true_f) + K.sum(y_pred_f) + smooth
         )
@@ -131,11 +82,11 @@ def main():
     steps_per_epoch = 1
     val_steps_per_epoch = 10
     history = model.fit(
-        train_generator,
+        train_loader,
         steps_per_epoch=steps_per_epoch,
         epochs=20,
         verbose=1,
-        validation_data=val_generator,
+        validation_data=val_loader,
         validation_steps=val_steps_per_epoch,
         batch_size=10,
     )

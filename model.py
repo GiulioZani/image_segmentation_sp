@@ -11,8 +11,7 @@ from keras import backend as keras
 from tensorflow.keras import layers
 
 # from tensorflow.keras.optimizers import Adam
-"""
-def get_model(input_shape):
+def get_model3D(input_shape):
     input_l = layers.Input(shape=(input_shape))
     x = (
         layers.TimeDistributed(
@@ -182,10 +181,10 @@ def get_model(input_shape):
 
     model = models.Model(inputs=input_l, outputs=out)
     model.summary()
-"""
 
-def get_model(input_size=(256, 256, 3)):
-    inputs = Input(input_size)
+
+def get_unet2D(input_size=(256, 256, 3)):
+    inputs = Input(shape=input_size)
     conv1 = Conv2D(
         64,
         3,
@@ -362,8 +361,13 @@ def get_model(input_size=(256, 256, 3)):
 
     model = Model(inputs, conv10)
 
-    if pretrained_weights:
-        model.load_weights(pretrained_weights)
-
     return model
-"""
+
+def get_model(input_shape, model_type):
+    input_shape = input_shape[1:]
+    if model_type == "2D":
+        print("loading unet")
+        return get_unet2D(input_shape)
+    else:
+        return get_model3D(input_shape)
+
