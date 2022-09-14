@@ -11,6 +11,7 @@ from keras import backend as keras
 from tensorflow.keras import layers
 
 # from tensorflow.keras.optimizers import Adam
+"""
 def get_model(input_shape):
     input_l = layers.Input(shape=(input_shape))
     x = (
@@ -181,10 +182,9 @@ def get_model(input_shape):
 
     model = models.Model(inputs=input_l, outputs=out)
     model.summary()
-
-
 """
-def get_model(pretrained_weights=None, input_size=(256, 256, 3)):
+
+def get_model(input_size=(256, 256, 3)):
     inputs = Input(input_size)
     conv1 = Conv2D(
         64,
