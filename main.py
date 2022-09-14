@@ -25,12 +25,11 @@ from keras import models
 from tensorflow.python.keras.layers import ConvLSTM2D
 
 
-
 def main():
     gpu_available = tf.test.is_gpu_available(
         cuda_only=False, min_cuda_compute_capability=None
     )
-    print(f"\n{gpu_available=}\n")
+    print(f"\n gpu_available={gpu_available}\n")
     train_generator, val_generator = get_generators()
     """
     x, y = train_generator.__next__()
@@ -69,8 +68,8 @@ def main():
 
     # Define the model metrcis and load model.
     """
-    #num_train_imgs = len(os.listdir("/gdrive/MyDrive/train/train_images/images"))
-    #num_val_images = len(os.listdir("/gdrive/MyDrive/train/val_images/images"))
+    # num_train_imgs = len(os.listdir("/gdrive/MyDrive/train/train_images/images"))
+    # num_val_images = len(os.listdir("/gdrive/MyDrive/train/val_images/images"))
     # steps_per_epoch = num_train_imgs // batch_size
     # val_steps_per_epoch = num_val_images // batch_size
     """
