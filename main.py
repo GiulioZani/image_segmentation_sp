@@ -91,13 +91,13 @@ def main():
 
     # batch_size  x * y * n_channels
     def dice_coefficient(y_true, y_pred, smooth=0.0001):
-
         y_true_f = K.flatten(y_true)
         y_pred_f = K.flatten(y_pred)
         # print(y_true_f.shape, y_pred_f.shape)
-
-        intersection = K.sum(y_true_f * y_pred_f)
-
+        try:
+            intersection = K.sum(y_true_f * y_pred_f)
+        except:
+            ipdb.set_trace()
         return (2.0 * intersection + smooth) / (
             K.sum(y_true_f) + K.sum(y_pred_f) + smooth
         )
@@ -110,7 +110,10 @@ def main():
 
     def iou(y_true, y_pred):
         # ipdb.set_trace()
-        intersection = K.sum(K.abs(y_true) * (y_true))
+        try:
+            intersection = K.sum(K.abs(y_true) * (y_true))
+        except:
+            ipdb.set_trace()
         sum_ = K.sum(K.square(y_true)) + K.sum(K.square(y_pred))
         jac = (intersection) / (sum_ - intersection)
         return jac
@@ -121,8 +124,9 @@ def main():
     metrics = [iou, dice_coefficient, "binary_accuracy"]
 
     model.compile(optimizer=optim, loss=dice_coefficient_loss, metrics=metrics)
-    steps_per_epoch = 1000
-    val_steps_per_epoch = 1000
+    model.summary()
+    steps_per_epoch = 1
+    val_steps_per_epoch = 10
     history = model.fit(
         train_generator,
         steps_per_epoch=steps_per_epoch,

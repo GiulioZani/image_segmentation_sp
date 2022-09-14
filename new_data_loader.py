@@ -1,12 +1,13 @@
 import os
 from IPython.core.completer import time
-import ipdb
 from natsort import natsorted
 from tensorflow.keras.preprocessing.image import (
     array_to_img,
     img_to_array,
     load_img,
 )
+from tensorflow.keras import layers
+import tensorflow as tf
 import numpy as np
 
 
@@ -17,6 +18,12 @@ class GetLoader:
         self.timesteps = timesteps
         self.batch_size = batch_size
         self.squeeze = squeeze
+        self.augmentation = tf.keras.Sequential(
+            [
+                layers.RandomFlip("horizontal_and_vertical"),
+                layers.RandomRotation(0.2),
+            ]
+        )
 
     def __iter__(self):
         return self
@@ -31,6 +38,13 @@ class GetLoader:
         x, y = np.array(xs), np.array(ys)
         if self.squeeze:
             x = x.squeeze(-1).transpose(0, 2, 3, 1)
+
+        xy = self.augmentation(tf.concat((x, y), axis=-1))
+
+        x = xy[:, :, :, :3]
+        y = xy[:, :, :, 3:]
+        # if not tf.reduce_all(y[0] == 0):
+        #    ipdb.set_trace()
         return x, y
 
 
@@ -89,12 +103,20 @@ class DataLoader:
             fn.replace("images", "masks") for fn in val_img_file_names
         ]
         self.val_imgs = (
-            np.array([img_to_array(load_img(fn)) for fn in val_img_file_names])
+            np.array(
+                [
+                    img_to_array(load_img(fn, color_mode="grayscale"))
+                    for fn in val_img_file_names
+                ]
+            )
             / 255
         )
         self.val_masks = (
             np.array(
-                [img_to_array(load_img(fn)) for fn in val_mask_file_names]
+                [
+                    img_to_array(load_img(fn, color_mode="grayscale"))
+                    for fn in val_mask_file_names
+                ]
             )
             / 255
             > 0.5
