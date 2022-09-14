@@ -8,7 +8,7 @@ from keras.layers import *
 from keras.optimizers import *
 from keras.callbacks import ModelCheckpoint, LearningRateScheduler
 from keras import backend as keras
-
+from tensorflow.keras.optimizers import Adam
 """
 input_l = layers.Input(shape=(input_shape))
 x =  (layers.TimeDistributed(layers.Conv2D( 64, kernel_size=(3, 3),padding='same',strides=(1,1),activation='relu',kernel_initializer='he_normal' ) )) (input_l)
